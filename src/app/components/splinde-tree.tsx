@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Section, ComputedSection, Entry } from '@/lib/types';
 import { TreeNode } from './tree-node';
 
