@@ -92,7 +92,7 @@ npm run dev
 
 - **Next.js App Router**: Modern file-based routing, API routes, and React Server Components.
 - **TypeScript**: Type safety for all data and components.
-- **Tailwind CSS 4+**: Utility-first styling.
+- **Tailwind CSS 4+**: Utility-first styling. / Custom CSS
 - **In-memory Data**: No database or persistence; all edits are local.
 - **Recursive Components**: Clean handling of arbitrarily deep trees.
 
