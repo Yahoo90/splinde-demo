@@ -20,7 +20,7 @@ export default async function Home() {
   const data = await getData();
 
   return (
-    <main className="min-h-screen transition-colors">
+    <main className="min-h-screen bg-background transition-colors">
       <SplindeTree initialData={data} />
     </main>
   );
