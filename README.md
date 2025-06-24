@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## SPLINDE DEMO Project Plan
 
-## Getting Started
+### Features
 
-First, run the development server:
+- **API route** (`/api/data`): Serves static demo data.
+- **Recursive sum computation** for all sections and total.
+- **Editable entries** (`sum` and `note`), with live updates.
+- **Recursive rendering** for arbitrarily nested trees.
+- **Responsive UI** (Tailwind CSS).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+### Folder Structure
+
+```
+/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── data/
+│   │   │       └── route.ts        # API endpoint serving demoData
+│   │   ├── components/             # UI components (recursive tree, editors)
+│   │   ├── page.tsx                # Main page, fetches data, manages state
+│   │   ├── layout.tsx              # Root layout
+│   │   ├── globals.css             # Global styles
+│   │   └── ...                     # Other routes, layouts, etc.
+│   ├── lib/
+│   │   ├── demoData.ts             # Provided static data
+│   │   └── types.ts                # TypeScript type definitions
+├── public/                         # Static assets
+├── postcss.config.mjs              # PostCSS config
+├── tsconfig.json                   # TypeScript config
+├── package.json
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Data Flow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **API Route**:  
+   `/api/data` returns the static `demoData` tree.
 
-## Learn More
+2. **Frontend Fetch**:  
+   On load, the app fetches data from `/api/data`.
 
-To learn more about Next.js, take a look at the following resources:
+3. **Sum Computation**:  
+   A recursive function computes `computedSum` for each section and the total sum for the root, after each edit.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Editing**:  
+   Users can edit `sum` and `note` fields.  
+   On `onBlur`, the entry is updated in local state and sums are recomputed.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. **Rendering**:  
+   The tree is rendered recursively, supporting any nesting.  
+   Each section displays its computed sum.  
+   The total sum is displayed at the top.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### How to Run
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18+ recommended)
+- [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/)
+
+#### Installation
+
+```
+git clone https://github.com/your-username/splinde-demo.git
+cd splinde-demo
+npm install
+```
+
+#### Development
+
+```
+npm run dev
+```
+
+- Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+#### API Endpoint
+
+- [http://localhost:3000/api/data](http://localhost:3000/api/data)  
+  Returns the demo data as JSON.
+
+---
+
+### Technical Decisions
+
+- **Next.js App Router**: Modern file-based routing, API routes, and React Server Components.
+- **TypeScript**: Type safety for all data and components.
+- **Tailwind CSS 4+**: Utility-first styling.
+- **In-memory Data**: No database or persistence; all edits are local.
+- **Recursive Components**: Clean handling of arbitrarily deep trees.
+
+---
+
+### Optional Enhancements
+
+- Collapsible/expandable sections
+- Add/remove entries or sections
+- Docker Compose setup
+- Improved mobile UI
+
+---
+
+## 📄 License
+
+MIT
+
+---
+
+## Questions?
+
+Feel free to reach out or open an issue!
+```
+
+</rewritten_file>
