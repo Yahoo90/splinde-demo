@@ -5,7 +5,7 @@ import { Entry, Section, ComputedSection } from '@/lib/types';
 
 interface TreeNodeProps {
   node: Entry | ComputedSection;
-  onUpdate: (path: number[], field: 'sum' | 'note', value: string | number) => void;
+  onUpdate: (path: number[], field: 'sum' | 'note' | 'name', value: string | number) => void;
   path: number[];
   level?: number;
 }
@@ -15,10 +15,33 @@ function isEntry(node: Entry | ComputedSection): node is Entry {
 }
 
 export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(level === 0);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingName, setEditingName] = useState(node.name);
   
   const marginLeft = level > 0 ? `${level * 16}px` : '0px';
   const borderClass = level > 0 ? 'border-l-2 pl-4' : '';
+
+  const handleNameDoubleClick = () => {
+    setIsEditingName(true);
+    setEditingName(node.name);
+  };
+
+  const handleNameSave = () => {
+    if (editingName.trim() !== node.name) {
+      onUpdate(path, 'name', editingName.trim());
+    }
+    setIsEditingName(false);
+  };
+
+  const handleNameKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleNameSave();
+    } else if (e.key === 'Escape') {
+      setEditingName(node.name);
+      setIsEditingName(false);
+    }
+  };
 
   if (isEntry(node)) {
     return (
@@ -33,7 +56,31 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                borderColor: 'var(--color-gray-300)',
                color: 'var(--color-foreground)'
              }}>
-          <h3 className="font-semibold mb-3">{node.name}</h3>
+          {isEditingName ? (
+            <input
+              type="text"
+              value={editingName}
+              onChange={(e) => setEditingName(e.target.value)}
+              onBlur={handleNameSave}
+              onKeyDown={handleNameKeyDown}
+              className="font-semibold mb-3 w-full px-2 py-1 border-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer"
+              style={{
+                borderColor: 'var(--color-blue-400)',
+                backgroundColor: 'var(--color-background)',
+                color: 'var(--color-foreground)',
+                fontSize: 'inherit'
+              }}
+              autoFocus
+            />
+          ) : (
+            <h3 
+              className="font-semibold mb-3 cursor-pointer hover:opacity-80 transition-opacity"
+              onDoubleClick={handleNameDoubleClick}
+              title="Double-click to edit name"
+            >
+              {node.name}
+            </h3>
+          )}
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -115,10 +162,36 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                 ▶
               </span>
             </button>
-            <h2 className={`font-bold ${isRootLevel ? 'text-2xl' : 'text-lg'}`} 
-                style={{ color: 'var(--color-foreground)' }}>
-              {section.name}
-            </h2>
+            
+            {isEditingName ? (
+              <input
+                type="text"
+                value={editingName}
+                onChange={(e) => setEditingName(e.target.value)}
+                onBlur={handleNameSave}
+                onKeyDown={handleNameKeyDown}
+                className={`font-bold px-2 py-1 border-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer ${
+                  isRootLevel ? 'text-2xl' : 'text-lg'
+                }`}
+                style={{
+                  borderColor: 'var(--color-blue-400)',
+                  backgroundColor: 'var(--color-background)',
+                  color: 'var(--color-foreground)'
+                }}
+                autoFocus
+              />
+            ) : (
+              <h2 
+                className={`font-bold cursor-pointer hover:opacity-80 transition-opacity ${
+                  isRootLevel ? 'text-2xl' : 'text-lg'
+                }`}
+                style={{ color: 'var(--color-foreground)' }}
+                onDoubleClick={handleNameDoubleClick}
+                title="Double-click to edit name"
+              >
+                {section.name}
+              </h2>
+            )}
           </div>
           
           <div className={`rounded-full shadow-md transition-all duration-200 hover:scale-105 ${

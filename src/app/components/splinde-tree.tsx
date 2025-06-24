@@ -44,15 +44,12 @@ function addComputedSums(node: Entry | Section): Entry | ComputedSection {
 function updateNodeInTree(
   node: Entry | ComputedSection,
   path: number[],
-  field: 'sum' | 'note',
+  field: 'sum' | 'note' | 'name',
   value: string | number
 ): Entry | ComputedSection {
   if (path.length === 0) {
     // Update this node
-    if ('sum' in node && 'note' in node && !('children' in node)) {
-      return { ...node, [field]: value };
-    }
-    return node;
+    return { ...node, [field]: value };
   }
   
   // Navigate deeper
@@ -76,7 +73,7 @@ export function SplindeTree({ initialData }: SplindeTreeProps) {
     addComputedSums(initialData) as ComputedSection
   );
 
-  const handleUpdate = (path: number[], field: 'sum' | 'note', value: string | number) => {
+  const handleUpdate = (path: number[], field: 'sum' | 'note' | 'name', value: string | number) => {
     setData(prevData => {
       const updated = updateNodeInTree(prevData, path, field, value);
       return addComputedSums(updated) as ComputedSection;
