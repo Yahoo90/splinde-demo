@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Section, ComputedSection, Entry } from '@/lib/types';
+import { Section, ComputedSection, Entry, NodeAction } from '@/lib/types';
 import { TreeNode } from './tree-node';
 
 interface SplindeTreeProps {
@@ -68,14 +68,105 @@ function updateNodeInTree(
   return node;
 }
 
+function addNodeToTree(
+  node: Entry | ComputedSection,
+  path: number[],
+  nodeType: 'entry' | 'section'
+): Entry | ComputedSection {
+  if (path.length === 0) {
+    // Add to this node (must be a section)
+    if ('children' in node) {
+      const newChild = nodeType === 'entry' 
+        ? { name: 'New Entry', note: '', sum: 0 } as Entry
+        : { name: 'New Section', children: [] } as Section;
+      
+      return {
+        ...node,
+        children: [...node.children, newChild]
+      } as ComputedSection;
+    }
+    return node;
+  }
+  
+  // Navigate deeper
+  if ('children' in node) {
+    const [nextIndex, ...remainingPath] = path;
+    const updatedChildren = node.children.map((child, index) => {
+      if (index === nextIndex) {
+        return addNodeToTree(child, remainingPath, nodeType);
+      }
+      return child;
+    });
+    
+    return { ...node, children: updatedChildren } as ComputedSection;
+  }
+  
+  return node;
+}
+
+function removeNodeFromTree(
+  node: Entry | ComputedSection,
+  path: number[]
+): Entry | ComputedSection | null {
+  if (path.length === 0) {
+    // Remove this node
+    return null;
+  }
+  
+  // Navigate deeper
+  if ('children' in node) {
+    const [nextIndex, ...remainingPath] = path;
+    
+    if (remainingPath.length === 0) {
+      // Remove child at nextIndex
+      const updatedChildren = node.children.filter((_, index) => index !== nextIndex);
+      return { ...node, children: updatedChildren } as ComputedSection;
+    } else {
+      // Continue navigating
+      const updatedChildren = node.children.map((child, index) => {
+        if (index === nextIndex) {
+          const result = removeNodeFromTree(child, remainingPath);
+          return result;
+        }
+        return child;
+      }).filter((child): child is Entry | ComputedSection => child !== null);
+      
+      return { ...node, children: updatedChildren } as ComputedSection;
+    }
+  }
+  
+  return node;
+}
+
 export function SplindeTree({ initialData }: SplindeTreeProps) {
   const [data, setData] = useState<ComputedSection>(() => 
     addComputedSums(initialData) as ComputedSection
   );
 
-  const handleUpdate = (path: number[], field: 'sum' | 'note' | 'name', value: string | number) => {
+  const handleAction = (action: NodeAction) => {
     setData(prevData => {
-      const updated = updateNodeInTree(prevData, path, field, value);
+      let updated: Entry | ComputedSection | null = prevData;
+      
+      switch (action.type) {
+        case 'update':
+          updated = updateNodeInTree(prevData, action.path, action.field, action.value);
+          break;
+        case 'add-entry':
+          updated = addNodeToTree(prevData, action.path, 'entry');
+          break;
+        case 'add-section':
+          updated = addNodeToTree(prevData, action.path, 'section');
+          break;
+        case 'remove-node':
+          updated = removeNodeFromTree(prevData, action.path);
+          break;
+      }
+      
+      if (updated === null) {
+        // If root is removed, return original data
+        return prevData;
+      }
+      
       return addComputedSums(updated) as ComputedSection;
     });
   };
@@ -90,7 +181,7 @@ export function SplindeTree({ initialData }: SplindeTreeProps) {
       
       <TreeNode 
         node={data}
-        onUpdate={handleUpdate}
+        onAction={handleAction}
         path={[]}
         level={0}
       />

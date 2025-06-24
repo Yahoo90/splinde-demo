@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Entry, Section, ComputedSection } from '@/lib/types';
+import { Entry, Section, ComputedSection, NodeAction } from '@/lib/types';
 
 interface TreeNodeProps {
   node: Entry | ComputedSection;
-  onUpdate: (path: number[], field: 'sum' | 'note' | 'name', value: string | number) => void;
+  onAction: (action: NodeAction) => void;
   path: number[];
   level?: number;
 }
@@ -52,7 +52,7 @@ function getNodeIcon(name: string): string {
   return iconMap[name] || '📋'; // Default icon if not found
 }
 
-export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
+export function TreeNode({ node, onAction, path, level = 0 }: TreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(level === 0);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState(node.name);
@@ -68,7 +68,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
 
   const handleNameSave = () => {
     if (editingName.trim() !== node.name) {
-      onUpdate(path, 'name', editingName.trim());
+      onAction({ type: 'update', path, field: 'name', value: editingName.trim() });
     }
     setIsEditingName(false);
   };
@@ -89,13 +89,27 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
              marginLeft,
              borderLeftColor: level > 0 ? 'var(--color-gray-300)' : undefined
            }}>
-        <div className="rounded-lg shadow-md border p-3 sm:p-4 transition-all duration-400 hover:shadow-xl"
+        <div className="rounded-lg shadow-md border p-3 sm:p-4 transition-all duration-400 hover:shadow-xl relative group"
              style={{ 
                backgroundColor: 'var(--color-background)',
                borderColor: 'var(--color-gray-300)',
                color: 'var(--color-foreground)',
                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
              }}>
+          {/* Remove button - positioned in top-right corner */}
+          <button
+            onClick={() => onAction({ type: 'remove-node', path })}
+            className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 p-1.5 rounded-full shadow-md"
+            style={{
+              backgroundColor: 'var(--color-red-500)',
+              color: 'white',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
+            title="Remove this entry"
+          >
+            <span className="text-xs sm:text-sm">🗑️</span>
+          </button>
+          
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
             <span className="text-lg sm:text-xl md:text-2xl flex-shrink-0 transition-transform duration-300">
               {nodeIcon}
@@ -146,7 +160,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
                 }}
                 defaultValue={node.sum}
-                onBlur={(e) => onUpdate(path, 'sum', parseFloat(e.target.value) || 0)}
+                onBlur={(e) => onAction({ type: 'update', path, field: 'sum', value: parseFloat(e.target.value) || 0 })}
               />
             </div>
             
@@ -164,7 +178,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
                 }}
                 defaultValue={node.note}
-                onBlur={(e) => onUpdate(path, 'note', e.target.value)}
+                onBlur={(e) => onAction({ type: 'update', path, field: 'note', value: e.target.value })}
               />
             </div>
           </div>
@@ -178,12 +192,12 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
   const isRootLevel = level === 0;
   
   return (
-    <div className={`${borderClass} py-1.5 sm:py-2 animate-slideIn`} 
+    <div className={`${borderClass} py-1.5 sm:py-2 animate-slideIn relative`} 
          style={{ 
            marginLeft,
            borderLeftColor: level > 0 ? 'var(--color-gray-300)' : undefined
          }}>
-      <div className={`rounded-lg shadow-md transition-all duration-500 hover:shadow-2xl ${
+      <div className={`rounded-lg shadow-md transition-all duration-500 hover:shadow-2xl group ${
           isRootLevel ? 'p-4 sm:p-6 border' : 'p-3 sm:p-4 border-2'
         }`}
            style={{ 
@@ -260,18 +274,67 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
             )}
           </div>
           
-          <div className={`rounded-full shadow-md transition-all duration-400 hover:shadow-xl animate-float flex-shrink-0 ${
-              isRootLevel ? 'px-3 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 sm:border-3' : 'px-2 sm:px-3 md:px-4 py-1 sm:py-2 border'
-            }`}
-               style={{ 
-                 backgroundColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-200)',
-                 borderColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-300)',
-                 color: isRootLevel ? 'var(--color-background)' : 'var(--color-gray-700)',
-                 transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease-out'
-               }}>
-            <span className={`font-bold ${isRootLevel ? 'text-sm sm:text-lg md:text-xl' : 'text-xs sm:text-sm'}`}>
-              <span className="hidden sm:inline">Total: </span>{section.computedSum.toFixed(2)}
-            </span>
+          {/* Action buttons positioned to the left of total sum */}
+          <div className={`flex items-center ${isRootLevel ? 'gap-3 sm:gap-4 md:gap-6' : 'gap-1 sm:gap-2'}`}>
+            <div className="flex items-center gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 relative z-10">
+              {/* Add Entry button */}
+              <button
+                onClick={() => onAction({ type: 'add-entry', path })}
+                className="cursor-pointer flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 p-1.5 sm:p-2 shadow-md"
+                style={{
+                  backgroundColor: 'var(--color-green-500)',
+                  color: 'white',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                title="Add new entry"
+              >
+                <span className="text-xs sm:text-sm">➕</span>
+              </button>
+              
+              {/* Add Section button */}
+              <button
+                onClick={() => onAction({ type: 'add-section', path })}
+                className="cursor-pointer flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 p-1.5 sm:p-2 shadow-md"
+                style={{
+                  backgroundColor: 'var(--color-blue-500)',
+                  color: 'white',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                title="Add new section"
+              >
+                <span className="text-xs sm:text-sm">📁</span>
+              </button>
+              
+              {/* Remove Section button - only show if not root level */}
+              {level > 0 && (
+                <button
+                  onClick={() => onAction({ type: 'remove-node', path })}
+                  className="cursor-pointer flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 p-1.5 sm:p-2 shadow-md"
+                  style={{
+                    backgroundColor: 'var(--color-red-500)',
+                    color: 'white',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  title="Remove this section"
+                >
+                  <span className="text-xs sm:text-sm">🗑️</span>
+                </button>
+              )}
+            </div>
+            
+            <div className={`rounded-full shadow-md transition-all duration-400 hover:shadow-xl animate-float flex-shrink-0 relative z-0 ${
+                isRootLevel ? 'px-3 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 sm:border-3' : 'px-2 sm:px-3 md:px-4 py-1 sm:py-2 border'
+              }`}
+                 style={{ 
+                   backgroundColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-200)',
+                   borderColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-300)',
+                   color: isRootLevel ? 'var(--color-background)' : 'var(--color-gray-700)',
+                   transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease-out'
+                 }}>
+              <span className={`font-bold ${isRootLevel ? 'text-sm sm:text-lg md:text-xl' : 'text-xs sm:text-sm'}`}>
+                <span className="hidden sm:inline">Total: </span>{section.computedSum.toFixed(2)}
+              </span>
+            </div>
           </div>
         </div>
         
@@ -299,7 +362,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               >
                 <TreeNode
                   node={child}
-                  onUpdate={onUpdate}
+                  onAction={onAction}
                   path={[...path, index]}
                   level={level + 1}
                 />
