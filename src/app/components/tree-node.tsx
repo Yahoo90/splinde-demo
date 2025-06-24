@@ -57,8 +57,8 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState(node.name);
   
-  const marginLeft = level > 0 ? `${level * 16}px` : '0px';
-  const borderClass = level > 0 ? 'border-l-2 pl-4' : '';
+  const marginLeft = level > 0 ? `${Math.min(level * 12, 48)}px` : '0px'; // Limit nesting on mobile
+  const borderClass = level > 0 ? 'border-l-2 pl-2 sm:pl-4' : '';
   const nodeIcon = getNodeIcon(node.name);
 
   const handleNameDoubleClick = () => {
@@ -84,20 +84,20 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
 
   if (isEntry(node)) {
     return (
-      <div className={`${borderClass} py-2 animate-slideIn`} 
+      <div className={`${borderClass} py-1.5 sm:py-2 animate-slideIn`} 
            style={{ 
              marginLeft,
              borderLeftColor: level > 0 ? 'var(--color-gray-300)' : undefined
            }}>
-        <div className="rounded-lg shadow-md border p-4 transition-all duration-400 hover:shadow-xl"
+        <div className="rounded-lg shadow-md border p-3 sm:p-4 transition-all duration-400 hover:shadow-xl"
              style={{ 
                backgroundColor: 'var(--color-background)',
                borderColor: 'var(--color-gray-300)',
                color: 'var(--color-foreground)',
                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
              }}>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl flex-shrink-0 transition-transform duration-300 hover:scale-110">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <span className="text-lg sm:text-xl md:text-2xl flex-shrink-0 transition-transform duration-300">
               {nodeIcon}
             </span>
             {isEditingName ? (
@@ -107,7 +107,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                 onChange={(e) => setEditingName(e.target.value)}
                 onBlur={handleNameSave}
                 onKeyDown={handleNameKeyDown}
-                className="font-semibold w-full px-2 py-1 border-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer animate-pulse-subtle"
+                className="font-semibold w-full px-2 py-1 border-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer animate-pulse-subtle text-sm sm:text-base"
                 style={{
                   borderColor: 'var(--color-blue-400)',
                   backgroundColor: 'var(--color-background)',
@@ -119,7 +119,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               />
             ) : (
               <h3 
-                className="font-semibold cursor-pointer transition-all duration-300 hover:opacity-80 hover:transform hover:scale-105"
+                className="font-semibold cursor-pointer transition-all duration-300 hover:opacity-80 hover:transform text-sm sm:text-base md:text-lg"
                 onDoubleClick={handleNameDoubleClick}
                 title="Double-click to edit name"
                 style={{
@@ -131,14 +131,14 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
             )}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-              <label className="block text-sm font-medium mb-2 transition-colors duration-200" style={{ color: 'var(--color-gray-600)' }}>
+              <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 transition-colors duration-200" style={{ color: 'var(--color-gray-600)' }}>
                 Sum
               </label>
               <input
                 type="number"
-                className="w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] focus:scale-[1.02]"
+                className="w-full px-2.5 sm:px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer hover:shadow-lg text-sm sm:text-base"
                 style={{
                   borderColor: 'var(--color-gray-300)',
                   backgroundColor: 'var(--color-gray-50)',
@@ -151,12 +151,12 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
             </div>
             
             <div className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-              <label className="block text-sm font-medium mb-2 transition-colors duration-200" style={{ color: 'var(--color-gray-600)' }}>
+              <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 transition-colors duration-200" style={{ color: 'var(--color-gray-600)' }}>
                 Note
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] focus:scale-[1.02]"
+                className="w-full px-2.5 sm:px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer hover:shadow-lg text-sm sm:text-base"
                 style={{
                   borderColor: 'var(--color-gray-300)',
                   backgroundColor: 'var(--color-gray-50)',
@@ -178,13 +178,13 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
   const isRootLevel = level === 0;
   
   return (
-    <div className={`${borderClass} py-2 animate-slideIn`} 
+    <div className={`${borderClass} py-1.5 sm:py-2 animate-slideIn`} 
          style={{ 
            marginLeft,
            borderLeftColor: level > 0 ? 'var(--color-gray-300)' : undefined
          }}>
       <div className={`rounded-lg shadow-md transition-all duration-500 hover:shadow-2xl ${
-          isRootLevel ? 'p-6 border' : 'p-4 border-2'
+          isRootLevel ? 'p-4 sm:p-6 border' : 'p-3 sm:p-4 border-2'
         }`}
            style={{ 
              background: isRootLevel 
@@ -196,12 +196,12 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                : undefined,
              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease-out'
            }}>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className={`flex-shrink-0 flex items-center justify-center rounded-full transition-all duration-400 shadow-md cursor-pointer animate-bounce-subtle ${
-                isRootLevel ? 'w-10 h-10 hover:scale-125 hover:shadow-lg' : 'w-7 h-7 hover:scale-115 hover:shadow-md'
+                isRootLevel ? 'w-8 h-8 sm:w-10 sm:h-10 hover:shadow-lg' : 'w-6 h-6 sm:w-7 sm:h-7 hover:shadow-md'
               }`}
               style={{ 
                 backgroundColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-200)',
@@ -210,7 +210,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               }}
             >
               <span className={`transform transition-all duration-500 font-bold ${isExpanded ? 'rotate-90' : 'rotate-0'} ${
-                isRootLevel ? 'text-lg' : 'text-sm'
+                isRootLevel ? 'text-sm sm:text-lg' : 'text-xs sm:text-sm'
               }`}
               style={{
                 transition: 'transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
@@ -219,8 +219,8 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               </span>
             </button>
             
-            <span className={`flex-shrink-0 transition-transform duration-300 hover:scale-110 ${
-              isRootLevel ? 'text-3xl' : 'text-2xl'
+            <span className={`flex-shrink-0 transition-transform duration-300 ${
+              isRootLevel ? 'text-xl sm:text-2xl md:text-3xl' : 'text-lg sm:text-xl md:text-2xl'
             }`}>
               {nodeIcon}
             </span>
@@ -232,8 +232,8 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                 onChange={(e) => setEditingName(e.target.value)}
                 onBlur={handleNameSave}
                 onKeyDown={handleNameKeyDown}
-                className={`font-bold px-2 py-1 border-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer animate-pulse-subtle ${
-                  isRootLevel ? 'text-2xl' : 'text-lg'
+                className={`font-bold px-2 py-1 border-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer animate-pulse-subtle flex-1 min-w-0 ${
+                  isRootLevel ? 'text-lg sm:text-xl md:text-2xl' : 'text-base sm:text-lg'
                 }`}
                 style={{
                   borderColor: 'var(--color-blue-400)',
@@ -245,8 +245,8 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               />
             ) : (
               <h2 
-                className={`font-bold cursor-pointer transition-all duration-300 hover:opacity-80 hover:transform hover:scale-105 ${
-                  isRootLevel ? 'text-2xl' : 'text-lg'
+                className={`font-bold cursor-pointer transition-all duration-300 hover:opacity-80 hover:transform flex-1 min-w-0 truncate ${
+                  isRootLevel ? 'text-lg sm:text-xl md:text-2xl' : 'text-base sm:text-lg'
                 }`}
                 style={{ 
                   color: 'var(--color-foreground)',
@@ -260,8 +260,8 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
             )}
           </div>
           
-          <div className={`rounded-full shadow-md transition-all duration-400 hover:shadow-xl animate-float ${
-              isRootLevel ? 'px-8 py-4 border-3' : 'px-4 py-2 border'
+          <div className={`rounded-full shadow-md transition-all duration-400 hover:shadow-xl animate-float flex-shrink-0 ${
+              isRootLevel ? 'px-3 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 sm:border-3' : 'px-2 sm:px-3 md:px-4 py-1 sm:py-2 border'
             }`}
                style={{ 
                  backgroundColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-200)',
@@ -269,8 +269,8 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                  color: isRootLevel ? 'var(--color-background)' : 'var(--color-gray-700)',
                  transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease-out'
                }}>
-            <span className={`font-bold ${isRootLevel ? 'text-xl' : 'text-sm'}`}>
-              Total: {section.computedSum.toFixed(2)}
+            <span className={`font-bold ${isRootLevel ? 'text-sm sm:text-lg md:text-xl' : 'text-xs sm:text-sm'}`}>
+              <span className="hidden sm:inline">Total: </span>{section.computedSum.toFixed(2)}
             </span>
           </div>
         </div>
@@ -283,7 +283,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
         style={{
           transition: 'all 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
         }}>
-          <div className={`space-y-3 ${isRootLevel ? 'mt-6' : 'mt-4'}`}>
+          <div className={`space-y-2 sm:space-y-3 ${isRootLevel ? 'mt-4 sm:mt-6' : 'mt-3 sm:mt-4'}`}>
             {section.children.map((child, index) => (
               <div
                 key={`${child.name}-${index}`}
