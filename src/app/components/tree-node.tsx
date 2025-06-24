@@ -99,7 +99,7 @@ export function TreeNode({ node, onAction, path, level = 0 }: TreeNodeProps) {
           {/* Remove button - positioned in top-right corner */}
           <button
             onClick={() => onAction({ type: 'remove-node', path })}
-            className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 p-1.5 rounded-full shadow-md"
+            className="cursor-pointer absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 p-1.5 rounded-full shadow-md"
             style={{
               backgroundColor: 'var(--color-red-500)',
               color: 'white',

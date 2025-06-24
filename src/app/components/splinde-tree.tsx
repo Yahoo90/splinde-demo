@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Section, ComputedSection, Entry, NodeAction } from '@/lib/types';
 import { TreeNode } from './tree-node';
+import { useNotifications } from './notification-provider';
 
 interface SplindeTreeProps {
   initialData: Section;
@@ -142,8 +143,32 @@ export function SplindeTree({ initialData }: SplindeTreeProps) {
   const [data, setData] = useState<ComputedSection>(() => 
     addComputedSums(initialData) as ComputedSection
   );
+  const { addNotification } = useNotifications();
+
+  const getNodeName = (node: Entry | ComputedSection, path: number[]): string => {
+    if (path.length === 0) return node.name;
+    
+    // Navigate to the node to get its name
+    let current: Entry | ComputedSection = node;
+    for (const index of path) {
+      if ('children' in current) {
+        current = current.children[index];
+      }
+    }
+    return current.name;
+  };
 
   const handleAction = (action: NodeAction) => {
+    let shouldShowNotification = false;
+    let notificationMessage = '';
+    let notificationType: 'success' | 'info' = 'info';
+    let nodeName = '';
+
+    // Get node name before removal if needed
+    if (action.type === 'remove-node') {
+      nodeName = getNodeName(data, action.path);
+    }
+
     setData(prevData => {
       let updated: Entry | ComputedSection | null = prevData;
       
@@ -153,12 +178,23 @@ export function SplindeTree({ initialData }: SplindeTreeProps) {
           break;
         case 'add-entry':
           updated = addNodeToTree(prevData, action.path, 'entry');
+          shouldShowNotification = true;
+          notificationMessage = 'New entry added successfully! 📝';
+          notificationType = 'success';
           break;
         case 'add-section':
           updated = addNodeToTree(prevData, action.path, 'section');
+          shouldShowNotification = true;
+          notificationMessage = 'New section created successfully! 📁';
+          notificationType = 'success';
           break;
         case 'remove-node':
           updated = removeNodeFromTree(prevData, action.path);
+          if (updated !== null) {
+            shouldShowNotification = true;
+            notificationMessage = `"${nodeName}" has been removed 🗑️`;
+            notificationType = 'info';
+          }
           break;
       }
       
@@ -169,6 +205,13 @@ export function SplindeTree({ initialData }: SplindeTreeProps) {
       
       return addComputedSums(updated) as ComputedSection;
     });
+
+    // Show notification after state update is complete
+    if (shouldShowNotification) {
+      setTimeout(() => {
+        addNotification(notificationMessage, notificationType);
+      }, 0);
+    }
   };
 
   return (
