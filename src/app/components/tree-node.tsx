@@ -197,7 +197,7 @@ export function TreeNode({ node, onAction, path, level = 0 }: TreeNodeProps) {
            marginLeft,
            borderLeftColor: level > 0 ? 'var(--color-gray-300)' : undefined
          }}>
-      <div className={`rounded-lg shadow-md transition-all duration-500 hover:shadow-2xl group ${
+      <div className={`rounded-lg shadow-md transition-all duration-500 hover:shadow-2xl ${
           isRootLevel ? 'p-4 sm:p-6 border' : 'p-3 sm:p-4 border-2'
         }`}
            style={{ 
@@ -276,7 +276,7 @@ export function TreeNode({ node, onAction, path, level = 0 }: TreeNodeProps) {
           
           {/* Action buttons positioned to the left of total sum */}
           <div className={`flex items-center ${isRootLevel ? 'gap-3 sm:gap-4 md:gap-6' : 'gap-1 sm:gap-2'}`}>
-            <div className="flex items-center gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 relative z-10">
+            <div className="flex items-center gap-1 sm:gap-2 opacity-0 hover:opacity-100 transition-all duration-300 relative z-10">
               {/* Add Entry button */}
               <button
                 onClick={() => onAction({ type: 'add-entry', path })}
