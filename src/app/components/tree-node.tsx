@@ -17,12 +17,12 @@ function isEntry(node: Entry | ComputedSection): node is Entry {
 export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   
-  const indentClass = level > 0 ? `ml-${level * 4}` : '';
+  const marginLeft = level > 0 ? `${level * 16}px` : '0px';
   const borderClass = level > 0 ? 'border-l-2 border-gray-200 dark:border-gray-600 pl-4' : '';
 
   if (isEntry(node)) {
     return (
-      <div className={`${indentClass} ${borderClass} py-2`}>
+      <div className={`${borderClass} py-2`} style={{ marginLeft }}>
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md dark:hover:shadow-gray-900/25 transition-shadow">
           <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">{node.name}</h3>
           
@@ -60,7 +60,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
   const section = node as ComputedSection;
   
   return (
-    <div className={`${indentClass} ${borderClass} py-2`}>
+    <div className={`${borderClass} py-2`} style={{ marginLeft }}>
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-blue-200 dark:border-gray-600 p-4 shadow-sm hover:shadow-md dark:hover:shadow-gray-900/25 transition-all">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
