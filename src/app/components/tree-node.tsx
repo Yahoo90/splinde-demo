@@ -260,7 +260,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
             )}
           </div>
           
-          <div className={`rounded-full shadow-md transition-all duration-400 hover:scale-110 hover:shadow-xl hover:-translate-y-1 animate-float ${
+          <div className={`rounded-full shadow-md transition-all duration-400 hover:shadow-xl animate-float ${
               isRootLevel ? 'px-8 py-4 border-3' : 'px-4 py-2 border'
             }`}
                style={{ 
