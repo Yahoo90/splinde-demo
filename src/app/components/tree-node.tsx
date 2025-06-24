@@ -42,7 +42,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               </label>
               <input
                 type="number"
-                className="w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer"
                 style={{
                   borderColor: 'var(--color-gray-300)',
                   backgroundColor: 'var(--color-gray-50)',
@@ -59,7 +59,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer"
                 style={{
                   borderColor: 'var(--color-gray-300)',
                   backgroundColor: 'var(--color-gray-50)',
@@ -77,6 +77,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
 
   // This is a ComputedSection
   const section = node as ComputedSection;
+  const isRootLevel = level === 0;
   
   return (
     <div className={`${borderClass} py-2`} 
@@ -84,44 +85,58 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
            marginLeft,
            borderLeftColor: level > 0 ? 'var(--color-gray-300)' : undefined
          }}>
-      <div className="rounded-lg border-2 p-4 shadow-md hover:shadow-lg transition-all duration-200"
+      <div className={`rounded-lg shadow-md hover:shadow-lg transition-all duration-200 ${
+          isRootLevel ? 'p-6 border-4' : 'p-4 border-2'
+        }`}
            style={{ 
-             background: 'linear-gradient(to right, var(--color-gray-100), var(--color-gray-50))',
-             borderColor: 'var(--color-gray-300)'
+             background: isRootLevel 
+               ? 'linear-gradient(135deg, var(--color-gray-50), var(--color-gray-100))' 
+               : 'linear-gradient(to right, var(--color-gray-100), var(--color-gray-50))',
+             borderColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-300)',
+             boxShadow: isRootLevel 
+               ? '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+               : undefined
            }}>
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full hover:opacity-80 transition-colors shadow-sm"
+              className={`flex-shrink-0 flex items-center justify-center rounded-full hover:opacity-80 transition-all duration-200 shadow-md cursor-pointer ${
+                isRootLevel ? 'w-10 h-10 hover:scale-105' : 'w-7 h-7'
+              }`}
               style={{ 
-                backgroundColor: 'var(--color-gray-200)',
-                color: 'var(--color-gray-600)'
+                backgroundColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-200)',
+                color: isRootLevel ? 'var(--color-background)' : 'var(--color-gray-600)'
               }}
             >
-              <span className={`transform transition-transform text-sm font-bold ${isExpanded ? 'rotate-90' : ''}`}>
+              <span className={`transform transition-transform font-bold ${isExpanded ? 'rotate-90' : ''} ${
+                isRootLevel ? 'text-lg' : 'text-sm'
+              }`}>
                 ▶
               </span>
             </button>
-            <h2 className="text-lg font-bold" style={{ color: 'var(--color-foreground)' }}>
+            <h2 className={`font-bold ${isRootLevel ? 'text-2xl' : 'text-lg'}`} 
+                style={{ color: 'var(--color-foreground)' }}>
               {section.name}
             </h2>
           </div>
           
-          <div className="px-4 py-2 rounded-full border shadow-sm"
+          <div className={`rounded-full shadow-md transition-all duration-200 hover:scale-105 ${
+              isRootLevel ? 'px-8 py-4 border-3' : 'px-4 py-2 border'
+            }`}
                style={{ 
-                 backgroundColor: 'var(--color-gray-200)',
-                 borderColor: 'var(--color-gray-300)',
-                 color: 'var(--color-gray-700)'
+                 backgroundColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-200)',
+                 borderColor: isRootLevel ? 'var(--color-foreground)' : 'var(--color-gray-300)',
+                 color: isRootLevel ? 'var(--color-background)' : 'var(--color-gray-700)'
                }}>
-            <span className="text-sm font-bold">
+            <span className={`font-bold ${isRootLevel ? 'text-xl' : 'text-sm'}`}>
               Total: {section.computedSum.toFixed(2)}
             </span>
           </div>
         </div>
         
         {isExpanded && (
-          <div className="space-y-2 mt-4">
+          <div className={`space-y-3 ${isRootLevel ? 'mt-6' : 'mt-4'}`}>
             {section.children.map((child, index) => (
               <TreeNode
                 key={`${child.name}-${index}`}

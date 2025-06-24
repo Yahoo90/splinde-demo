@@ -89,18 +89,6 @@ export function SplindeTree({ initialData }: SplindeTreeProps) {
         <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--color-foreground)' }}>
           SPLINDE Demo
         </h1>
-        <div className="rounded-xl p-6 inline-block border-2 shadow-lg backdrop-blur-sm"
-             style={{ 
-               background: 'linear-gradient(to right, var(--color-gray-50), var(--color-gray-100))',
-               borderColor: 'var(--color-gray-300)'
-             }}>
-          <p className="text-lg font-semibold mb-1" style={{ color: 'var(--color-gray-700)' }}>
-            Grand Total
-          </p>
-          <p className="text-3xl font-bold" style={{ color: 'var(--color-gray-600)' }}>
-            {data.computedSum.toFixed(2)}
-          </p>
-        </div>
       </div>
       
       <TreeNode 
