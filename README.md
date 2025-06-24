@@ -68,7 +68,7 @@
 #### Installation
 
 ```
-git clone https://github.com/your-username/splinde-demo.git
+git clone https://github.com/yahoo90/splinde-demo.git
 cd splinde-demo
 npm install
 ```
@@ -117,5 +117,3 @@ MIT
 
 Feel free to reach out or open an issue!
 ```
-
-</rewritten_file>

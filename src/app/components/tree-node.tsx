@@ -14,6 +14,44 @@ function isEntry(node: Entry | ComputedSection): node is Entry {
   return 'sum' in node && 'note' in node && !('children' in node);
 }
 
+// Icon mapping function
+function getNodeIcon(name: string): string {
+  const iconMap: { [key: string]: string } = {
+    // Root level
+    'Annual Report': '📊',
+    
+    // Main categories
+    'Sales': '💰',
+    'Marketing': '📢',
+    'R&D': '🔬',
+    'Operations': '⚙️',
+    
+    // Sales subcategories
+    'Q1 Sales': '📈',
+    'Q2 Sales': '📈',
+    'Q3 Sales': '📈',
+    'Q4 Sales': '📈',
+    
+    // Marketing subcategories
+    'Digital Campaigns': '💻',
+    'Event Sponsorships': '🎪',
+    
+    // R&D subcategories
+    'New Product Development': '🛠️',
+    'Innovation Lab': '🧪',
+    
+    // Operations subcategories
+    'HR': '👥',
+    'Logistics': '🚚',
+    'Customer Support': '🎧',
+    
+    // HR subcategories
+    'HR tool': '💼',
+  };
+  
+  return iconMap[name] || '📋'; // Default icon if not found
+}
+
 export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
   const [isExpanded, setIsExpanded] = useState(level === 0);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -21,6 +59,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
   
   const marginLeft = level > 0 ? `${level * 16}px` : '0px';
   const borderClass = level > 0 ? 'border-l-2 pl-4' : '';
+  const nodeIcon = getNodeIcon(node.name);
 
   const handleNameDoubleClick = () => {
     setIsEditingName(true);
@@ -57,35 +96,40 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
                color: 'var(--color-foreground)',
                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
              }}>
-          {isEditingName ? (
-            <input
-              type="text"
-              value={editingName}
-              onChange={(e) => setEditingName(e.target.value)}
-              onBlur={handleNameSave}
-              onKeyDown={handleNameKeyDown}
-              className="font-semibold mb-3 w-full px-2 py-1 border-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer animate-pulse-subtle"
-              style={{
-                borderColor: 'var(--color-blue-400)',
-                backgroundColor: 'var(--color-background)',
-                color: 'var(--color-foreground)',
-                fontSize: 'inherit',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-              }}
-              autoFocus
-            />
-          ) : (
-            <h3 
-              className="font-semibold mb-3 cursor-pointer transition-all duration-300 hover:opacity-80"
-              onDoubleClick={handleNameDoubleClick}
-              title="Double-click to edit name"
-              style={{
-                transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
-              }}
-            >
-              {node.name}
-            </h3>
-          )}
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-2xl flex-shrink-0 transition-transform duration-300 hover:scale-110">
+              {nodeIcon}
+            </span>
+            {isEditingName ? (
+              <input
+                type="text"
+                value={editingName}
+                onChange={(e) => setEditingName(e.target.value)}
+                onBlur={handleNameSave}
+                onKeyDown={handleNameKeyDown}
+                className="font-semibold w-full px-2 py-1 border-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer animate-pulse-subtle"
+                style={{
+                  borderColor: 'var(--color-blue-400)',
+                  backgroundColor: 'var(--color-background)',
+                  color: 'var(--color-foreground)',
+                  fontSize: 'inherit',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+                autoFocus
+              />
+            ) : (
+              <h3 
+                className="font-semibold cursor-pointer transition-all duration-300 hover:opacity-80 hover:transform hover:scale-105"
+                onDoubleClick={handleNameDoubleClick}
+                title="Double-click to edit name"
+                style={{
+                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                }}
+              >
+                {node.name}
+              </h3>
+            )}
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
@@ -94,7 +138,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               </label>
               <input
                 type="number"
-                className="w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer hover:shadow-lg"
+                className="w-full px-3 py-2 border-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-[1.02] focus:scale-[1.02]"
                 style={{
                   borderColor: 'var(--color-gray-300)',
                   backgroundColor: 'var(--color-gray-50)',
@@ -175,6 +219,12 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
               </span>
             </button>
             
+            <span className={`flex-shrink-0 transition-transform duration-300 hover:scale-110 ${
+              isRootLevel ? 'text-3xl' : 'text-2xl'
+            }`}>
+              {nodeIcon}
+            </span>
+            
             {isEditingName ? (
               <input
                 type="text"
@@ -210,7 +260,7 @@ export function TreeNode({ node, onUpdate, path, level = 0 }: TreeNodeProps) {
             )}
           </div>
           
-          <div className={`rounded-full shadow-md transition-all duration-400 hover:shadow-xl animate-float ${
+          <div className={`rounded-full shadow-md transition-all duration-400 hover:scale-110 hover:shadow-xl hover:-translate-y-1 animate-float ${
               isRootLevel ? 'px-8 py-4 border-3' : 'px-4 py-2 border'
             }`}
                style={{ 
